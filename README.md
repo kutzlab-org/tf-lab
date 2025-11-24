@@ -128,7 +128,7 @@ Before you start provisioning the infrastructure in this repository, you'll want
        # ^^^^^ Replace this ^^^^^^
        key            = "${path_relative_to_include()}/tf.tfstate"
        region         = local.aws_region
-       dynamodb_table = "tf-locks"
+       use_lockfile   = true
      }
      generate = {
        path      = "backend.tf"

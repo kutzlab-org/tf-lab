@@ -311,8 +311,11 @@ For example, take this portion of [prod/us-east-1/stateful-ec2-asg-service/terra
 unit "service" {
   // You'll typically want to pin this to a particular version of your catalog repository.
   // e.g.
-  // source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/ec2-asg-stateful-service?ref=v0.1.0"
-  source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/ec2-asg-stateful-service"
+  // source = "github.com/acme/terragrunt-infrastructure-catalog//units/ec2-asg-stateful-service?ref=v0.1.0"
+  //
+  // If you are using a private catalog, you may want to use an SSH source URL instead:
+  // source = "git::git@github.com:acme/terragrunt-infrastructure-catalog.git//units/ec2-asg-stateful-service"
+  source = "github.com/gruntwork-io/terragrunt-infrastructure-catalog-example//units/ec2-asg-stateful-service"
 
   path = "service"
 

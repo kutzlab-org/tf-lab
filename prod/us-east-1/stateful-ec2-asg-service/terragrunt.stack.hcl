@@ -10,8 +10,11 @@ locals {
 unit "service" {
   // You'll typically want to pin this to a particular version of your catalog repo.
   // e.g.
-  // source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/ec2-asg-stateful-service?ref=v0.1.0"
-  source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/ec2-asg-stateful-service"
+  // source = "github.com/acme/terragrunt-infrastructure-catalog//units/ec2-asg-stateful-service?ref=v0.1.0"
+  //
+  // If you are using a private catalog, you may want to use an SSH source URL instead:
+  // source = "git::git@github.com:acme/terragrunt-infrastructure-catalog.git//units/ec2-asg-stateful-service"
+  source = "github.com/gruntwork-io/terragrunt-infrastructure-catalog-example//units/ec2-asg-stateful-service"
 
   path = "service"
 
@@ -40,8 +43,11 @@ unit "service" {
 unit "db" {
   // You'll typically want to pin this to a particular version of your catalog repo.
   // e.g.
-  // source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/mysql?ref=v0.1.0"
-  source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/mysql"
+  // source = "github.com/acme/terragrunt-infrastructure-catalog//units/mysql?ref=v0.1.0"
+  //
+  // If you are using a private catalog, you may want to use an SSH source URL instead:
+  // source = "git::git@github.com:acme/terragrunt-infrastructure-catalog.git//units/mysql"
+  source = "github.com/gruntwork-io/terragrunt-infrastructure-catalog-example//units/mysql"
 
   path = "db"
 
@@ -69,8 +75,11 @@ unit "db" {
 unit "asg_sg" {
   // You'll typically want to pin this to a particular version of your catalog repo.
   // e.g.
-  // source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/sg?ref=v0.1.0"
-  source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/sg"
+  // source = "github.com/acme/terragrunt-infrastructure-catalog//units/sg?ref=v0.1.0"
+  //
+  // If you are using a private catalog, you may want to use an SSH source URL instead:
+  // source = "git::git@github.com:acme/terragrunt-infrastructure-catalog.git//units/sg"
+  source = "github.com/gruntwork-io/terragrunt-infrastructure-catalog-example//units/sg"
 
   path = "sgs/asg"
 
@@ -86,8 +95,11 @@ unit "asg_sg" {
 unit "sg_to_db_sg_rule" {
   // You'll typically want to pin this to a particular version of your catalog repo.
   // e.g.
-  // source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/sg-to-db-sg-rule?ref=v0.1.0"
-  source = "git::git@github.com:gruntwork-io/terragrunt-infrastructure-catalog-example.git//units/sg-to-db-sg-rule"
+  // source = "github.com/acme/terragrunt-infrastructure-catalog//units/sg-to-db-sg-rule?ref=v0.1.0"
+  //
+  // If you are using a private catalog, you may want to use an SSH source URL instead:
+  // source = "git::git@github.com:acme/terragrunt-infrastructure-catalog.git//units/sg-to-db-sg-rule"
+  source = "github.com/gruntwork-io/terragrunt-infrastructure-catalog-example//units/sg-to-db-sg-rule"
 
   path = "rules/sg-to-db-sg-rule"
 

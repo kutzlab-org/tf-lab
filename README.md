@@ -138,10 +138,17 @@ Before you start provisioning the infrastructure in this repository, you'll want
 
    Alternatively, you can set the `EX_BUCKET_PREFIX` environment variable to set a custom prefix. S3 bucket names must be globally unique across all AWS customers, so you'll have to make sure that the value you choose doesn't conflict with any existing bucket names.
 
-2. Update the `account_name` and `aws_account_id` parameters in [`non-prod/account.hcl`](/non-prod/account.hcl) and [`prod/account.hcl`](/prod/account.hcl) with the names and IDs of accounts you want to use for non production and production workloads, respectively.
+2. Set the `EX_NON_PROD_ACCOUNT_ID` and `EX_PROD_ACCOUNT_ID` environment variables to the AWS account IDs you want to use for non-production and production workloads, respectively.
+
+   ```bash
+   export EX_NON_PROD_ACCOUNT_ID="123456789012"
+   export EX_PROD_ACCOUNT_ID="210987654321"
+   ```
+
+   Alternatively, you can replace the `get_env(...)` calls in [`non-prod/account.hcl`](/non-prod/account.hcl) and [`prod/account.hcl`](/prod/account.hcl) with hardcoded account ID strings.
 
    > [!TIP]
-   > If you want everything deployed in a single AWS account, you can just use different values for the `account_name` parameter, and keep the `aws_account_id` parameter the same.
+   > If you want everything deployed in a single AWS account, you can set both environment variables to the same value (or use the same hardcoded string in both files).
 
 3. Configure your local AWS credentials using one of the supported [authentication mechanisms](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
 

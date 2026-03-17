@@ -2,5 +2,5 @@
 # root.hcl configuration.
 locals {
   account_name   = "non-prod"
-  aws_account_id = "replaceme" # TODO: replace me with your AWS account ID!
+  aws_account_id = get_env("EX_NON_PROD_ACCOUNT_ID")
 }

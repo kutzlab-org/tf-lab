@@ -21,7 +21,7 @@ This repository provides a practical blueprint for managing infrastructure with 
 * **Scalable `infrastructure-live` Structure:** Organizes infrastructure logically by account and region, providing a proven foundation adaptable to growing complexity.
 * **Best-Practice Separation:** Clearly separates environment-specific "live" configurations (this repo) from reusable infrastructure patterns (via an `infrastructure-catalog`).
 * **DRY Configuration:** Reduces code duplication using hierarchical configuration files (`root.hcl`, `account.hcl`, `region.hcl`).
-* **Concrete End-to-End Example:** Deploys a sample stateful web application (ASG, ALB, MySQL) across distinct production and non-production environments.
+* **Concrete End-to-End Example:** Deploys a sample stateful serverless application (Lambda, DynamoDB) across distinct production and non-production environments.
 * **Reproducible Tooling:** Includes `mise` configuration for easy installation of pinned versions of Terragrunt and OpenTofu/Terraform.
 
 ## Getting Started
@@ -89,12 +89,11 @@ This repository contains the following:
 
 - `terragrunt.stack.hcl` files: These files define a stack of Terragrunt units.
 
-  Both the `terragrunt.stack.hcl` files in this repository provision the units required for a stateful ASG service, including:
+  Both the `terragrunt.stack.hcl` files in this repository provision the units required for a stateful Lambda service, including:
 
-  - EC2 Auto Scaling Group (ASG)
-  - Application Load Balancer (ALB)
-  - Security Groups (SGs)
-  - MySQL Database (DB)
+  - AWS Lambda Function
+  - DynamoDB Table
+  - IAM Role
 
   The configurations for these resources aren't defined in this repository, but are instead defined in the [terragrunt-infrastructure-catalog-example](https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example) repository.
 
@@ -124,11 +123,11 @@ Before you start provisioning the infrastructure in this repository, you'll want
      config = {
        encrypt        = true
        # vvvvv Replace this vvvvvv
-       bucket         = "${get_env("TG_BUCKET_PREFIX", "")}terragrunt-example-tf-state-${local.account_name}-${local.aws_region}"
+       bucket         = "${get_env("EX_BUCKET_PREFIX", "")}terragrunt-example-tf-state-${local.account_name}-${local.aws_region}"
        # ^^^^^ Replace this ^^^^^^
        key            = "${path_relative_to_include()}/tf.tfstate"
        region         = local.aws_region
-       use_lockfile   = true
+       use_lockfile  = true
      }
      generate = {
        path      = "backend.tf"
@@ -137,12 +136,19 @@ Before you start provisioning the infrastructure in this repository, you'll want
    }
    ```
 
-   Alternatively, you can set the `TG_BUCKET_PREFIX` environment variable to set a custom prefix. S3 bucket names must be globally unique across all AWS customers, so you'll have to make sure that the value you choose doesn't conflict with any existing bucket names.
+   Alternatively, you can set the `EX_BUCKET_PREFIX` environment variable to set a custom prefix. S3 bucket names must be globally unique across all AWS customers, so you'll have to make sure that the value you choose doesn't conflict with any existing bucket names.
 
-2. Update the `account_name` and `aws_account_id` parameters in [`non-prod/account.hcl`](/non-prod/account.hcl) and [`prod/account.hcl`](/prod/account.hcl) with the names and IDs of accounts you want to use for non production and production workloads, respectively.
+2. Set the `EX_NON_PROD_ACCOUNT_ID` and `EX_PROD_ACCOUNT_ID` environment variables to the AWS account IDs you want to use for non-production and production workloads, respectively.
+
+   ```bash
+   export EX_NON_PROD_ACCOUNT_ID="123456789012"
+   export EX_PROD_ACCOUNT_ID="210987654321"
+   ```
+
+   Alternatively, you can replace the `get_env(...)` calls in [`non-prod/account.hcl`](/non-prod/account.hcl) and [`prod/account.hcl`](/prod/account.hcl) with hardcoded account ID strings.
 
    > [!TIP]
-   > If you want everything deployed in a single AWS account, you can just use different values for the `account_name` parameter, and keep the `aws_account_id` parameter the same.
+   > If you want everything deployed in a single AWS account, you can set both environment variables to the same value (or use the same hardcoded string in both files).
 
 3. Configure your local AWS credentials using one of the supported [authentication mechanisms](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
 
@@ -152,18 +158,18 @@ Before you start provisioning the infrastructure in this repository, you'll want
    e.g.
 
    ```bash
-   cd non-prod/us-east-1/stateful-ec2-asg-service
+   cd non-prod/us-east-1/stateful-lambda-service
    ```
 
 2. Run the following to generate the relevant units for the stack, and run a plan against them.
 
    ```bash
-   terragrunt run --all --non-interactive --bootstrap-backend plan
+   terragrunt run --all --non-interactive --backend-bootstrap plan
    ```
 
    > [!TIP]
    >
-   > The `--bootstrap-backend` flag there allows Terragrunt to automatically create relevant backend resources for you before running OpenTofu.
+   > The `--backend-bootstrap` flag there allows Terragrunt to automatically create relevant backend resources for you before running OpenTofu.
    >
    > You don't need to use the flag if you are using backend resources that already exist, or don't want Terragrunt to create them for you.
 
@@ -202,24 +208,20 @@ If you'd like to interact with the infrastructure that was just provisioned, you
 1. Get the output values for the stack that you just provisioned.
 
    ```bash
-   $ cd non-prod/us-east-1/stateful-ec2-asg-service
+   $ cd non-prod/us-east-1/stateful-lambda-service
    $ terragrunt stack output
-   service = {
-     alb_dns_name          = "stateful-asg-service-XXXXXXXXXX.us-east-1.elb.amazonaws.com"
-     alb_security_group_id = "sg-XXXXXXXXXXXX"
-     asg_name              = "terraform-XXXXXXXXXXXXXXXXXXXXXXXX"
-     asg_security_group_id = "sg-XXXXXXXXXXXX"
-     url                   = "http://stateful-asg-service-XXXXXXXXXX.us-east-1.elb.amazonaws.com:80"
-   }
-   sg_to_db_sg_rule = null
-   asg_sg = {
-     id = "sg-XXXXXXXXXXXX"
+   role = {
+     arn  = "arn:aws:iam::XXXXXXXXXXXX:role/stateful-lambda-service-dev-role"
+     name = "stateful-lambda-service-dev-role"
    }
    db = {
-     arn                  = "arn:aws:rds:us-east-1:XXXXXXXXXXXX:db:terraform-XXXXXXXXXXXXXXXXXXXXXXXX"
-     db_name              = "statefulasgservicedb"
-     db_security_group_id = "sg-XXXXXXXXXXXX"
-     endpoint             = "terraform-XXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXX.us-east-1.rds.amazonaws.com:3306"
+     arn  = "arn:aws:dynamodb:us-east-1:XXXXXXXXXXXX:table/stateful-lambda-service-dev-db"
+     name = "stateful-lambda-service-dev-db"
+   }
+   lambda_service = {
+     function_arn  = "arn:aws:lambda:us-east-1:XXXXXXXXXXXX:function:stateful-lambda-service-dev"
+     function_name = "stateful-lambda-service-dev"
+     function_url  = "https://XXXXXXXXXX.lambda-url.us-east-1.on.aws/"
    }
    ```
 
@@ -228,14 +230,18 @@ If you'd like to interact with the infrastructure that was just provisioned, you
 2. Use the output values to interact with the infrastructure.
 
    ```bash
-   $ URL="$(terragrunt stack output --raw service.url)"
+   $ URL="$(terragrunt stack output --raw lambda_service.function_url)"
    $ curl $URL
-   OK
-   $ curl $URL/movies
-   [{"id":1,"title":"The Matrix","releaseYear":1999},{"id":2,"title":"The Matrix Reloaded","releaseYear":2003},{"id":3,"title":"The Matrix Revolutions","releaseYear":2003}]
+   {"count":0}
+   $ curl -X POST $URL
+   {"count":1}
+   $ curl $URL
+   {"count":1}
    ```
 
-   Outputs can be indexed by output key. In this case, the `service` unit has an output key of `url`, so we can access it directly with `service.url`. When outputs are nested into stacks, you can access them by chaining the stack name, unit name, and output key.
+   A `GET` request returns the current count as JSON. A `POST` request increments the count and returns the updated value.
+
+   Outputs can be indexed by output key. In this case, the `lambda_service` unit has an output key of `function_url`, so we can access it directly with `lambda_service.function_url`. When outputs are nested into stacks, you can access them by chaining the stack name, unit name, and output key.
 
 ## How is the code in this repository organized?
 
@@ -253,7 +259,7 @@ Where:
 
 - `account` is the AWS account being managed (e.g. `non-prod`, `prod`, `mgmt`).
 - `region` is the AWS region being managed (e.g. `us-east-1`).
-- `resources` are the resources being managed (e.g. `stateful-ec2-asg-service`).
+- `resources` are the resources being managed (e.g. `stateful-lambda-service`).
 
 This structure is geared towards exclusive management of infrastructure in AWS, but can be adapted to other cloud providers, etc. by adjusting the hierarchy according to the patterns of the platform.
 
@@ -302,17 +308,17 @@ The `terragrunt.stack.hcl` file is used to define configurations for a stack of 
 
 Using the `values` attribute of [stack](https://terragrunt.gruntwork.io/docs/reference/config-blocks-and-attributes/#stack) and [unit](https://terragrunt.gruntwork.io/docs/reference/config-blocks-and-attributes/#unit) configuration blocks allows you to pass down configuration to units with granular control.
 
-For example, consider this portion of the [prod/us-east-1/stateful-ec2-asg-service/terragrunt.stack.hcl](prod/us-east-1/stateful-ec2-asg-service/terragrunt.stack.hcl) file:
+For example, consider this portion of the [prod/us-east-1/stateful-lambda-service/terragrunt.stack.hcl](prod/us-east-1/stateful-lambda-service/terragrunt.stack.hcl) file:
 
 ```hcl
-unit "service" {
+unit "lambda_service" {
   // You'll typically want to pin this to a particular version of your catalog repository.
   // e.g.
-  // source = "github.com/acme/terragrunt-infrastructure-catalog//units/ec2-asg-stateful-service?ref=v0.1.0"
+  // source = "github.com/acme/terragrunt-infrastructure-catalog//units/lambda-stateful-service?ref=v0.1.0"
   //
   // If you are using a private catalog, you may want to use an SSH source URL instead:
-  // source = "git::git@github.com:acme/terragrunt-infrastructure-catalog.git//units/ec2-asg-stateful-service"
-  source = "github.com/gruntwork-io/terragrunt-infrastructure-catalog-example//units/ec2-asg-stateful-service"
+  // source = "git::git@github.com:acme/terragrunt-infrastructure-catalog.git//units/lambda-stateful-service"
+  source = "github.com/gruntwork-io/terragrunt-infrastructure-catalog-example//units/js-lambda-stateful-service"
 
   path = "service"
 
@@ -321,25 +327,26 @@ unit "service" {
     // to use when fetching the OpenTofu/Terraform module.
     version = "main"
 
-    name          = local.name
-    instance_type = "t4g.micro"
-    min_size      = 2
-    max_size      = 4
-    server_port   = 3000
-    alb_port      = 80
+    name = local.name
 
-    db_path     = "../db"
-    asg_sg_path = "../sgs/asg"
+    // Required inputs
+    runtime    = "nodejs22.x"
+    source_dir = "./src"
+    handler    = "index.handler"
+    zip_file   = "handler.zip"
 
-    // This is used for the userdata script that
-    // bootstraps the EC2 instances.
-    db_username = local.db_username
-    db_password = local.db_password
+    // Optional inputs
+    memory  = 128
+    timeout = 3
+
+    // Dependency paths
+    role_path           = "../roles/lambda-iam-role-to-dynamodb"
+    dynamodb_table_path = "../db"
   }
 }
 ```
 
-Here, you can see that the `values` attribute is setting exactly the values that are unique to the `service` unit in the context of the `stateful-ec2-asg-service` stack, including the `version` of the OpenTofu module it uses, and the relative paths to the dependencies it relies on (e.g. the `db` and `asg_sg` units).
+Here, you can see that the `values` attribute is setting exactly the values that are unique to the `lambda_service` unit in the context of the `stateful-lambda-service` stack, including the `version` of the OpenTofu module it uses, and the relative paths to the dependencies it relies on (e.g. the `db` and `role` units).
 
 ## What to do with `.terraform.lock.hcl` files
 

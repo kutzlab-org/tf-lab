@@ -9,7 +9,7 @@ unit "lambda_service" {
   //
   // If you are using a private catalog, you may want to use an SSH source URL instead:
   // source = "git::git@github.com:acme/terragrunt-infrastructure-catalog.git//units/lambda-stateful-service"
-  source = "github.com/gruntwork-io/terragrunt-infrastructure-catalog-example//units/lambda-stateful-service"
+  source = "github.com/gruntwork-io/terragrunt-infrastructure-catalog-example//units/js-lambda-stateful-service"
 
   path = "service"
 
@@ -21,9 +21,9 @@ unit "lambda_service" {
     name = local.name
 
     // Required inputs
-    runtime    = "provided.al2023"
+    runtime    = "nodejs22.x"
     source_dir = "./src"
-    handler    = "bootstrap"
+    handler    = "index.handler"
     zip_file   = "handler.zip"
 
     // Optional inputs

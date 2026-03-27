@@ -9,6 +9,8 @@
 #   All resources must be deployed into that resource group, in its region.
 #   The subscription ID changes on every re-roll.
 #
+#   See docs/dev-sandbox-limits.md for allowed services, SKUs, and quotas.
+#
 # DEV ROTATION WORKFLOW:
 #   When you get a new dev sandbox:
 #     1. az login

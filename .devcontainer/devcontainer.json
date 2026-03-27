@@ -1,0 +1,51 @@
+{
+	"name": "Terraform",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/terraform:1": {
+			"version": "latest",
+			"tflint": "latest",
+			"terragrunt": "latest",
+			"terraformLanguageServer": "latest"
+		},
+		"ghcr.io/devcontainers/features/azure-cli:1.2.9": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"moby": false
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "lts"
+		},
+		"ghcr.io/devcontainers-extra/features/terraform-docs:1": {}
+	},
+	// "runArgs": ["--env-file", ".devcontainer/devcontainer.env"],
+	// "remoteEnv": {
+	// 	"TF_BACKEND_RESOURCE_GROUP": "${containerEnv:TF_BACKEND_RESOURCE_GROUP}",
+	// 	"TF_BACKEND_LOCATION": "${containerEnv:TF_BACKEND_LOCATION}",
+	// 	"TF_BACKEND_STORAGE_ACCOUNT": "${containerEnv:TF_BACKEND_STORAGE_ACCOUNT}",
+	// 	"TF_BACKEND_CONTAINER": "${containerEnv:TF_BACKEND_CONTAINER}",
+	// 	"TF_BACKEND_KEY": "${containerEnv:TF_BACKEND_KEY}",
+	// 	"ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}"
+	// },
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terraform.languageServer.enabled": true,
+				"terraform.languageServer.args": []
+			},
+			"extensions": [
+				"hashicorp.terraform",
+				"ms-vscode.azurecli",
+				"ms-azuretools.vscode-docker",
+				"ms-vsliveshare.vsliveshare",
+				"redhat.ansible",
+				"eamodio.gitlens",
+				"pkief.material-icon-theme",
+				"bridgecrewio.checkov",
+				"anthropics.claude-code"
+			]
+		}
+	},
+	"remoteUser": "vscode"
+}

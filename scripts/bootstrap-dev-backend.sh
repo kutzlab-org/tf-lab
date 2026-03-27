@@ -17,7 +17,7 @@
 #   - DEV_RESOURCE_GROUP set to your sandbox's predefined resource group name
 
 set -euo pipefail
-
+ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
 SUBSCRIPTION_ID="${ARM_SUBSCRIPTION_ID:-}"
 RESOURCE_GROUP="${DEV_RESOURCE_GROUP:-}"
 

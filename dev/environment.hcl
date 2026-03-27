@@ -29,4 +29,7 @@ locals {
   # The predefined resource group you must deploy into.
   # Set this env var to match the RG assigned to your sandbox.
   resource_group_name = get_env("DEV_RESOURCE_GROUP")
+
+  # The sandbox doesn't allow registering resource providers, so skip it.
+  resource_provider_registrations = "none"
 }

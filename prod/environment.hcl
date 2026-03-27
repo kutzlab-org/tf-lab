@@ -8,4 +8,6 @@
 locals {
   environment_name = "prod"
   subscription_id  = get_env("PROD_ARM_SUBSCRIPTION_ID")
+
+  resource_provider_registrations = "all"
 }

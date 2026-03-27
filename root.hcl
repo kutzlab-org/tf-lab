@@ -22,9 +22,10 @@ locals {
   environment_config = read_terragrunt_config(find_in_parent_folders("environment.hcl"))
   region_config      = read_terragrunt_config(find_in_parent_folders("region.hcl"))
 
-  environment_name = local.environment_config.locals.environment_name
-  subscription_id  = local.environment_config.locals.subscription_id
-  azure_region     = local.region_config.locals.azure_region
+  environment_name                = local.environment_config.locals.environment_name
+  subscription_id                 = local.environment_config.locals.subscription_id
+  azure_region                    = local.region_config.locals.azure_region
+  resource_provider_registrations = local.environment_config.locals.resource_provider_registrations
 
   # Backend storage config — from environment variables.
   #
@@ -67,7 +68,8 @@ generate "provider" {
 
     provider "azurerm" {
       features {}
-      subscription_id = "${local.subscription_id}"
+      subscription_id                 = "${local.subscription_id}"
+      resource_provider_registrations = "${local.resource_provider_registrations}"
     }
   EOF
 }

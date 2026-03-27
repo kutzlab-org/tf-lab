@@ -45,3 +45,26 @@ unit "storage_account" {
     }
   }
 }
+
+unit "aks_cluster" {
+  source = "${get_repo_root()}/units/aks-cluster"
+  path   = "aks-cluster"
+
+  # No depends_on — AKS and the storage account are independent resources that
+  # happen to live in the same resource group. Terragrunt can deploy them in parallel.
+
+  values = {
+    name                = "${local.stack_name}-aks"
+    resource_group_name = local.resource_group_name
+    location            = local.azure_region
+    # dns_prefix becomes part of the cluster's FQDN: <prefix>.<region>.azmk8s.io
+    dns_prefix          = "${local.stack_name}-aks"
+    node_pool_vm_size   = "Standard_D2s_v3"  # Only allowed VM size in dev sandbox
+    node_count          = 2                   # Sandbox max is 2; MS recommends >= 2 for system pools
+    tags = {
+      Environment = local.environment_name
+      Stack       = local.stack_name
+      ManagedBy   = "Terragrunt"
+    }
+  }
+}

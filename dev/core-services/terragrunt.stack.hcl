@@ -33,7 +33,7 @@ unit "storage_account" {
     # Azure storage account name constraints: 3-24 chars, lowercase alphanumeric only,
     # globally unique. We strip hyphens from the stack name and truncate to 24 chars.
     # Adjust or override if this conflicts with an existing account.
-    name                     = substr(replace("st${local.stack_name}", "-", ""), 0, 24)
+    name                     = "${substr(replace("st${local.stack_name}", "-", ""), 0, 24)}fish"
     resource_group_name      = local.resource_group_name
     location                 = local.azure_region
     account_tier             = "Standard"

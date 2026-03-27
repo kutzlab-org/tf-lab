@@ -9,5 +9,5 @@ inputs = {
   location                 = values.location
   account_tier             = values.account_tier
   account_replication_type = values.account_replication_type
-  tags                     = values.tags
+  tags                     = merge(include.root.locals.default_tags, try(values.tags, {}))
 }

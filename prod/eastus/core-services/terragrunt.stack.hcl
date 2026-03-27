@@ -22,11 +22,6 @@ unit "resource_group" {
   values = {
     name     = local.resource_group_name
     location = local.azure_region
-    tags = {
-      Environment = local.environment_name
-      Stack       = local.stack_name
-      ManagedBy   = "Terragrunt"
-    }
   }
 }
 
@@ -41,10 +36,5 @@ unit "storage_account" {
     location                 = local.azure_region
     account_tier             = "Standard"
     account_replication_type = "ZRS"  # Zone-redundant for prod resilience
-    tags = {
-      Environment = local.environment_name
-      Stack       = local.stack_name
-      ManagedBy   = "Terragrunt"
-    }
   }
 }

@@ -38,11 +38,6 @@ unit "storage_account" {
     location                 = local.azure_region
     account_tier             = "Standard"
     account_replication_type = "LRS"  # Cheapest option; fine for dev
-    tags = {
-      Environment = local.environment_name
-      Stack       = local.stack_name
-      ManagedBy   = "Terragrunt"
-    }
   }
 }
 
@@ -61,10 +56,5 @@ unit "aks_cluster" {
     dns_prefix          = "${local.stack_name}-aks"
     node_pool_vm_size   = "Standard_D2s_v3"  # Only allowed VM size in dev sandbox
     node_count          = 2                   # Sandbox max is 2; MS recommends >= 2 for system pools
-    tags = {
-      Environment = local.environment_name
-      Stack       = local.stack_name
-      ManagedBy   = "Terragrunt"
-    }
   }
 }

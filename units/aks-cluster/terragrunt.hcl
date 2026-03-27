@@ -26,5 +26,5 @@ inputs = {
   dns_prefix          = values.dns_prefix
   node_pool_vm_size   = values.node_pool_vm_size
   node_count          = values.node_count
-  tags                = values.tags
+  tags                = merge(include.root.locals.default_tags, try(values.tags, {}))
 }

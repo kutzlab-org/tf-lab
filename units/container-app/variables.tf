@@ -8,11 +8,6 @@ variable "resource_group_name" {
   type        = string
 }
 
-variable "container_app_environment_id" {
-  description = "ID of the Container App Environment to deploy into."
-  type        = string
-}
-
 variable "container_image" {
   description = "Container image to deploy (e.g. mcr.microsoft.com/k8se/quickstart:latest)."
   type        = string

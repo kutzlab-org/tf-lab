@@ -13,5 +13,5 @@ include "root" {
 inputs = {
   name     = values.name
   location = values.location
-  tags     = values.tags
+  tags     = merge(include.root.locals.default_tags, try(values.tags, {}))
 }

@@ -27,6 +27,23 @@ locals {
   azure_region                    = local.region_config.locals.azure_region
   resource_provider_registrations = local.environment_config.locals.resource_provider_registrations
 
+  # Derive the stack name from the unit's path without any extra config files.
+  # Units inside a stack live at: <env>/[<region>/]<stack>/.terragrunt-stack/<unit>
+  # Two dirname() calls strip the unit name and .terragrunt-stack/, leaving the stack dir.
+  # Units deployed outside a stack (e.g. bootstrap) get "unknown".
+  _unit_rel_path = path_relative_to_include()
+  stack_name = length(regexall("/.terragrunt-stack/", local._unit_rel_path)) > 0 ? basename(dirname(dirname(local._unit_rel_path))) : "unknown"
+
+  # Default tags applied to every resource in every unit.
+  # Units merge these with any extra tags passed via values.tags, with values.tags winning on conflict.
+  default_tags = {
+    Environment = local.environment_name
+    Stack       = local.stack_name
+    Region      = local.azure_region
+    ManagedBy   = "Terragrunt"
+    Repo        = "tf-lab"
+  }
+
   # Backend storage config — from environment variables.
   #
   # Why no defaults for storage account?

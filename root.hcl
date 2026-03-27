@@ -26,14 +26,14 @@ locals {
   subscription_id  = local.environment_config.locals.subscription_id
   azure_region     = local.region_config.locals.azure_region
 
-  # Backend storage config — ALL from environment variables, no defaults.
+  # Backend storage config — from environment variables.
   #
-  # Why no defaults?
+  # Why no defaults for storage account?
   #   - Storage account names must be globally unique in Azure; no generated name is safe.
   #   - Dev subscriptions rotate every few hours, so the backend changes with them.
   #
-  # For dev: run scripts/bootstrap-dev-backend.sh on each new subscription.
-  #          It creates the storage account and prints the vars to export.
+  # For dev: run scripts/bootstrap-dev-backend.sh on each new sandbox.
+  #          It creates backend storage in the predefined RG and prints the vars to export.
   # For prod: set these once in your CI/CD secrets or shell profile.
   #
   # Required:
@@ -41,6 +41,7 @@ locals {
   #
   # Optional (have sensible defaults):
   #   TF_BACKEND_RESOURCE_GROUP  — defaults to rg-tfstate-<env>
+  #                                 (dev overrides this to the predefined sandbox RG)
   #   TF_BACKEND_CONTAINER       — defaults to "tfstate"
   backend_resource_group  = get_env("TF_BACKEND_RESOURCE_GROUP", "rg-tfstate-${local.environment_name}")
   backend_storage_account = get_env("TF_BACKEND_STORAGE_ACCOUNT")
